@@ -2,6 +2,7 @@ package com.wellgo.wad.contentprovider;
 
 import io.vertx.core.http.ServerWebSocket;
 
+
 /**
  * Created by Robin on 2015-12-16.
  * <p>
@@ -20,5 +21,9 @@ class Parameters {
 
     public String getAddress() {
         return socket.textHandlerID();
+    }
+    
+    public String getRemoteHost() {
+    	return socket.remoteAddress().host();
     }
 }

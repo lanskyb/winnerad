@@ -2,6 +2,7 @@ package com.wellgo.wad.contentprovider;
 
 import com.wellgo.wad.contentprovider.protocol.GetContentRequest;
 import com.wellgo.wad.contentprovider.protocol.Message;
+import com.wellgo.wad.contentprovider.protocol.ProbeRequest;
 import com.wellgo.wad.contentprovider.protocol.Serializer;
 
 
@@ -35,6 +36,23 @@ enum MessageHandler {
             GetContentRequest getContentReq = (GetContentRequest) Serializer.unpack(params.data, GetContentRequest.class);
 
             params.handler.getVertx().eventBus().send(Configuration.EB_ADDR_CONTENT_GENERATOR, Serializer.pack(getContentReq), ar -> {
+          	  if (ar.succeeded()) {
+          		    System.out.println("Sending generated content: " + ar.result().body());
+          		    params.socket.writeFinalTextFrame((String)ar.result().body());
+          	  }
+          	  else {
+          		System.out.println("Failed generate content");
+        		    params.socket.writeFinalTextFrame("{\"error\": \"Failed generate content\"}");
+          	  }
+          });
+        }
+    },
+    PROBE_REQ() {
+        @Override
+        public void invoke(Parameters params) {
+            ProbeRequest probeReq = (ProbeRequest) Serializer.unpack(params.data, GetContentRequest.class);
+
+            params.handler.getVertx().eventBus().send(Configuration.EB_ADDR_CONTENT_GENERATOR, Serializer.pack(probeReq), ar -> {
           	  if (ar.succeeded()) {
           		    System.out.println("Sending generated content: " + ar.result().body());
           		    params.socket.writeFinalTextFrame((String)ar.result().body());

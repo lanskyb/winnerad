@@ -13,6 +13,7 @@ import java.util.Map;
 
 
 import com.wellgo.wad.contentprovider.contentgenerator.ContentGeneratorVerticle;
+import com.wellgo.wad.contentprovider.healthcheck.ContentProviderHealthcheckVerticle;
 import com.wellgo.wad.contentprovider.protocol.Message;
 import com.wellgo.wad.contentprovider.protocol.Packet;
 import com.wellgo.wad.contentprovider.protocol.Serializer;
@@ -76,6 +77,7 @@ public class ContentProviderVerticle extends AbstractVerticle {
       });
       */
 	  
+	  
 	  messageHandler.put(Message.ACTION, MessageHandler.MESSAGE);
 	  
 	  contentGeneratorVerticle = new ContentGeneratorVerticle();
@@ -107,6 +109,8 @@ public class ContentProviderVerticle extends AbstractVerticle {
       				              fut.fail(res.cause());
       				          }
       				      });
+	  
+	  vertx.deployVerticle(new ContentProviderHealthcheckVerticle());
   }
   
   

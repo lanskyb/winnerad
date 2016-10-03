@@ -1,0 +1,5 @@
+{
+	"http.port" : 8080,
+	"es.cluster.name" : "esonaws",
+	"es.cluster.nodes" : ["172.31.12.238","172.31.16.92"]
+}

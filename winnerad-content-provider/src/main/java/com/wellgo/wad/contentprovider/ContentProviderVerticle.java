@@ -2,15 +2,8 @@ package com.wellgo.wad.contentprovider;
 
 
 
-
 import java.util.HashMap;
 import java.util.Map;
-
-
-
-
-
-
 
 import com.wellgo.wad.contentprovider.contentgenerator.ContentGeneratorVerticle;
 import com.wellgo.wad.contentprovider.healthcheck.ContentProviderHealthcheckVerticle;
@@ -19,8 +12,12 @@ import com.wellgo.wad.contentprovider.protocol.Packet;
 import com.wellgo.wad.contentprovider.protocol.Serializer;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 
 public class ContentProviderVerticle extends AbstractVerticle {
@@ -28,6 +25,10 @@ public class ContentProviderVerticle extends AbstractVerticle {
   private Map<String, MessageHandler> messageHandler = new HashMap<>();
   private ContentGeneratorVerticle contentGeneratorVerticle;
   private HttpServer server;
+  
+  
+  private final static Logger logger = LoggerFactory.getLogger(ContentProviderVerticle.class);
+  
   
   /*
   @Override
@@ -78,11 +79,19 @@ public class ContentProviderVerticle extends AbstractVerticle {
       */
 	  
 	  
+	  
+	  
 	  messageHandler.put(Message.ACTION, MessageHandler.MESSAGE);
 	  
 	  contentGeneratorVerticle = new ContentGeneratorVerticle();
 	  
-	  vertx.deployVerticle(contentGeneratorVerticle);
+	  DeploymentOptions options = new DeploymentOptions()
+	    	    .setConfig(this.getVertx().getOrCreateContext().config());
+	  
+	  logger.info("config: " + this.getVertx().getOrCreateContext().config().encodePrettily());
+	    
+	  
+	  vertx.deployVerticle(contentGeneratorVerticle, options);
 	  
 	  server = vertx.createHttpServer().
       		websocketHandler(event -> {
@@ -94,7 +103,7 @@ public class ContentProviderVerticle extends AbstractVerticle {
       														  }); // data
       									
 										event.closeHandler(close -> {
-										                    	System.out.println("event.closeHandler!");
+											logger.info("event.closeHandler!");
 										                     }); // close
                   
 								
@@ -102,10 +111,10 @@ public class ContentProviderVerticle extends AbstractVerticle {
               							} // event
       						).listen(Configuration.LISTEN_PORT, res -> {
       				          if (res.succeeded()) {
-      				              System.out.println("Server is now listening!");
+      				              logger.info("Server is now listening!");
       				              fut.complete();
       				          } else {
-      				              System.out.println("Failed to bind!");
+      				              logger.error("Failed to bind!");
       				              fut.fail(res.cause());
       				          }
       				      });
@@ -117,12 +126,10 @@ public class ContentProviderVerticle extends AbstractVerticle {
   @Override
   public void stop(Future<Void> stopFuture) throws Exception {
 		// on shutdown
-	  System.out.println("ContentProviderVerticle - stop >>>");
+	  logger.info("ContentProviderVerticle - stop >>>");
 	  
 	  vertx.undeploy(contentGeneratorVerticle.deploymentID());
 	  
-	
-	  System.out.println("ContentProviderVerticle - stop <<<");
   }
 
 }

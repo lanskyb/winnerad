@@ -1,4 +1,4 @@
-package com.wellgo.wad.contentprovider;
+package com.wellgo.wad.contentprovider.suit;
 
 import java.io.File;
 import java.io.IOException;

@@ -11,12 +11,18 @@ import com.wellgo.wad.contentprovider.contentstorage.ContentStorageVerticle;
 
 import io.vertx.core.Future;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 public class ContentGeneratorVerticle extends AbstractVerticle {
 	
 	
 	private ContentStorageVerticle storageVerticle;
+	
+	
+	private final static Logger logger = LoggerFactory.getLogger(ContentGeneratorVerticle.class);
 
 	
 	
@@ -24,8 +30,13 @@ public class ContentGeneratorVerticle extends AbstractVerticle {
 	    public void start(Future<Void> startFuture) throws Exception {
 		   
 		   storageVerticle = new ContentStorageVerticle();
+		   
+		   DeploymentOptions options = new DeploymentOptions()
+		    	    .setConfig(this.getVertx().getOrCreateContext().config());
+		   
+		   logger.info("config: " + this.getVertx().getOrCreateContext().config().encodePrettily());
 		  
-		   vertx.deployVerticle(storageVerticle);
+		   vertx.deployVerticle(storageVerticle, options);
 		   
 		   
 		   MessageConsumer<String> consumer = vertx.eventBus().consumer(Configuration.EB_ADDR_CONTENT_GENERATOR);
@@ -58,7 +69,7 @@ public class ContentGeneratorVerticle extends AbstractVerticle {
       		    // message.reply(message.body());
            	  }
            	  else {
-           		System.out.println("Failed to get data from storage");
+           		logger.error("Failed to get data from storage");
            		message.reply("{\"error\": \"Failed to get data from storage\"}");
            	  }
            });

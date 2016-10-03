@@ -1,4 +1,4 @@
-package com.wellgo.wad.contentprovider;
+package com.wellgo.wad.contentprovider.suit;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,19 +20,21 @@ import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@Ignore
 @RunWith(VertxUnitRunner.class)
-public class ContentProviderVerticleTest {
+public class ContentProviderRemoteVerticleTest {
 	
   private static String remoteHost = "52.57.24.6";
   
-  private static String remoteHostPort = "8080";
+  private static int remoteHostPort = 8080;
   
   private static String awsLb = "wad-content-provider-lb-1982910833.eu-central-1.elb.amazonaws.com";
   
-  private static String awsLbPort = "80";
+  private static int awsLbPort = 80;
   
   
   private static String localHost = "localhost";
@@ -44,46 +46,13 @@ public class ContentProviderVerticleTest {
 
   @Before
   public void setUp(TestContext context) {
-	  
 	
-	embeddedElasticsearchServer = new EmbeddedElasticsearchServer();
-	
-	org.apache.http.client.HttpClient httpClient = HttpClients.createDefault();
-	HttpPut httpPut = new HttpPut("http://localhost:9200/publisher/wizard/publisher123?pretty");
-	// + templateName);
-	// httpPut.setEntity(new FileEntity(new File("template.json")));
-	try {
-		StringEntity input = new StringEntity("{\"publisher-name\": \"publisher 123\", \"wizards\": [{\"url\": \"http://ynet.co.il\", \"id\": \"wiz1\" }, { \"url\": \"http://walla.co.il\", \"id\": \"wiz2\"}]}");
-		input.setContentType("application/json");
-	    httpPut.setEntity(input);
-		HttpResponse resp = httpClient.execute(httpPut);
-		System.out.println("ES response for put: " + resp.getStatusLine());
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	
-	
-    vertx = Vertx.vertx();
-    vertx.deployVerticle(ContentProviderVerticle.class.getName(), context.asyncAssertSuccess());
-    
-    
-    try {
-		Thread.sleep(1000);
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
   }
 
   @After
   public void tearDown(TestContext context) {
 	System.out.println("tearDown >>>");
-	//for (int i=0; i<vertx.deploymentIDs().size(); i++)
-		//vertx.undeploy((String) vertx.deploymentIDs().toArray()[i]);
-    //vertx.close(context.asyncAssertSuccess());
-	 vertx.close();
-    embeddedElasticsearchServer.shutdown();
+	
    
  
     System.out.println("tearDown <<<");
@@ -95,17 +64,10 @@ public class ContentProviderVerticleTest {
 	
 	  
     final Async async = context.async();
-     /*
-    vertx.createHttpClient().getNow(8080, "localhost", "/",
-     response -> {
-      response.handler(body -> {
-        context.assertTrue(body.toString().contains("Hello"));
-        async.complete();
-      });
-    });
-    */
+ 
     
-   Vertx.vertx().createHttpClient().websocket(8080, localHost, "", websocket -> {
+   Vertx.vertx().createHttpClient().websocket(awsLbPort, awsLb, "", websocket -> {
+   //Vertx.vertx().createHttpClient().websocket(remoteHostPort, remoteHost, "", websocket -> {
     	websocket.handler(data -> {
           System.out.println("Server message: ");
           System.out.println("Received data " + data.toString("ISO-8859-1"));

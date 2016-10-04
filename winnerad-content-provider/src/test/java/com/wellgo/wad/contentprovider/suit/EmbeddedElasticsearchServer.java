@@ -37,7 +37,7 @@ public class EmbeddedElasticsearchServer {
         .put("index.number_of_shards", "1")
         .put("index.number_of_replicas", "0")
         .put("discovery.zen.ping.multicast.enabled", "false")
-        .put("cluster.name", "esonaws")
+        .put("cluster.name", "wad-cp-es")
         .build();
 
         node = nodeBuilder().settings(settings).client(false).node();

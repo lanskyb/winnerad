@@ -95,14 +95,14 @@ public class ContentStorageVerticle extends AbstractVerticle {
 		
 		String esClusterName = "esonaws";
 		
-		/*
+		
 		JsonArray esNodes = null;
 		
 		JsonObject config = this.getVertx().getOrCreateContext().config();
 		
 		if (config != null) {
 		
-			esClusterName = config.getString("es.cluster.name", "esonaws");
+			esClusterName = config.getString("es.cluster.name", "wad-cp-es");
 		
 		
 			logger.info("Received configuration: es.cluster.name: <" + esClusterName + "> ");
@@ -114,13 +114,11 @@ public class ContentStorageVerticle extends AbstractVerticle {
 			logger.warn("Received configuration is empty, using default values");
 		}
 		
-		*/
-		
 		
 		Settings settings = Settings.settingsBuilder()
 		        .put("cluster.name", esClusterName).build();
 		
-		/*
+		
 		
 		if (esNodes == null) {
 			esNodes = new JsonArray("[\"127.0.0.1\"]");
@@ -141,9 +139,9 @@ public class ContentStorageVerticle extends AbstractVerticle {
 			}
 		}
 
-		*/
 		
 		
+		/*
 		try {
 			client = TransportClient.builder().settings(settings).build()
 				        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300))
@@ -151,6 +149,7 @@ public class ContentStorageVerticle extends AbstractVerticle {
 		} catch (UnknownHostException e) {
 			logger.error("ContentStorageVerticle - initEsClient failed :" + e.getMessage(), e);
 		}
+		*/
 		
 		
 		logger.info("ContentStorageVerticle - initEsClient <<");

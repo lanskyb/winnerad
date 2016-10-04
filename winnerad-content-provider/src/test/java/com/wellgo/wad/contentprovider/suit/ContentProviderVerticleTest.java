@@ -70,7 +70,7 @@ public class ContentProviderVerticleTest {
     vertx = Vertx.vertx();
     
     DeploymentOptions options = new DeploymentOptions()
-    	    .setConfig(new JsonObject().put("http.port", 8080)
+    	    .setConfig(new JsonObject().put("http.port", 8080).put("es.cluster.name", "wad-cp-es")
     	    );
     
     vertx.deployVerticle(ContentProviderVerticle.class.getName(), options, context.asyncAssertSuccess());
@@ -128,6 +128,15 @@ public class ContentProviderVerticleTest {
           
           async.complete();
         });
+    	
+    	
+    	// Wait for ES connection
+    	try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	Message sentMsg = new Message("Echo message");
        

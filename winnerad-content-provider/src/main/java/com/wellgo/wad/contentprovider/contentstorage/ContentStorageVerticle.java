@@ -48,7 +48,7 @@ public class ContentStorageVerticle extends AbstractVerticle {
 		    
 		     
 		     //String widgets = (String) response.getField("widgets").getValue();
-		     //System.out.println("ContentGeneratorVerticle - Retrived from the storage widgetUrl" + widgets);
+		     //logger.debug("ContentGeneratorVerticle - Retrived from the storage widgetUrl" + widgets);
 		     
 		     if (!response.isExists()){ // || response.getField(PATH_FIELD) == null) {
 		         // doc not found
@@ -68,7 +68,7 @@ public class ContentStorageVerticle extends AbstractVerticle {
 		    		  
 		    		  for (int i = 0, size = jWizards.length(); i < size; i++) {
 		    		      JSONObject objectInArray = jWizards.getJSONObject(i);
-		    		      System.out.println(objectInArray.get("id") + "<--->" + objectInArray.get("url"));
+		    		      logger.debug(objectInArray.get("id") + "<--->" + objectInArray.get("url"));
 		    		    }
 		    		  
 		    		  message.reply(jWizards.toString());
@@ -82,7 +82,7 @@ public class ContentStorageVerticle extends AbstractVerticle {
 		     /*
     		 for (Map.Entry<String, Object> entry : response.getSource().entrySet())
     		 {
-    		     System.out.println(entry.getKey() + "/" + entry.getValue());
+    		     logger.debug(entry.getKey() + "/" + entry.getValue());
     		 }
     		 */
 
@@ -91,7 +91,7 @@ public class ContentStorageVerticle extends AbstractVerticle {
 
 	private void initEsClient() {
 		
-		logger.info("initEsClient >>");
+		logger.debug("initEsClient >>");
 		
 		String esClusterName = "esonaws";
 		
@@ -128,12 +128,15 @@ public class ContentStorageVerticle extends AbstractVerticle {
 		
 		logger.info("Received configuration: es.cluster.nodes: <" + esNodes.encode() + "> ");
 		
+		client = TransportClient.builder().settings(settings).build();
+		
 		for (int i = 0; i < esNodes.size(); i++) {
 		
 			try {
-				client = TransportClient.builder().settings(settings).build()
-					        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esNodes.getString(i)), 9300))
-					        .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(esNodes.getString(i), 9301)));
+				client
+				.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(esNodes.getString(i)), 9300))
+				.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(esNodes.getString(i), 9301)));
+				logger.info("Added ES transport for host: " + esNodes.getString(i));
 			} catch (UnknownHostException e) {
 				logger.error("ContentStorageVerticle - initEsClient failed :" + e.getMessage(), e);
 			}
@@ -159,9 +162,9 @@ public class ContentStorageVerticle extends AbstractVerticle {
 	  @Override
 	    public void stop(Future<Void> stopFuture) throws Exception {
 			// on shutdown
-		  System.out.println("ContentStorageVerticle - stop >>>");
+		  logger.info("ContentStorageVerticle - stop >>>");
 			client.close();
-		  System.out.println("ContentStorageVerticle - stop <<<");
+		  logger.info("ContentStorageVerticle - stop <<<");
 	    }
 	  
 	  

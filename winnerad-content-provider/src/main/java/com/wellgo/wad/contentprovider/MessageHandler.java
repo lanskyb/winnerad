@@ -5,6 +5,9 @@ import com.wellgo.wad.contentprovider.protocol.Message;
 import com.wellgo.wad.contentprovider.protocol.ProbeRequest;
 import com.wellgo.wad.contentprovider.protocol.Serializer;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 
 
 /**
@@ -13,17 +16,21 @@ import com.wellgo.wad.contentprovider.protocol.Serializer;
  * Handles incoming messages from clients.
  */
 enum MessageHandler {
+	
+	
+	
+	
     MESSAGE() {
         @Override
         public void invoke(Parameters params) {
             Message message = (Message) Serializer.unpack(params.data, Message.class);
             params.handler.getVertx().eventBus().send(Configuration.EB_ADDR_CONTENT_GENERATOR, Serializer.pack(message), ar -> {
             	  if (ar.succeeded()) {
-            		    System.out.println("Sending generated content: " + ar.result().body());
+            		    logger.debug("Sending generated content: " + ar.result().body());
             		    params.socket.writeFinalTextFrame((String)ar.result().body());
             	  }
             	  else {
-            		System.out.println("Failed generate content");
+            		logger.debug("Failed generate content");
           		    params.socket.writeFinalTextFrame("{\"error\": \"Failed generate content\"}");
             	  }
             });
@@ -37,11 +44,11 @@ enum MessageHandler {
 
             params.handler.getVertx().eventBus().send(Configuration.EB_ADDR_CONTENT_GENERATOR, Serializer.pack(getContentReq), ar -> {
           	  if (ar.succeeded()) {
-          		    System.out.println("Sending generated content: " + ar.result().body());
+          		    logger.debug("Sending generated content: " + ar.result().body());
           		    params.socket.writeFinalTextFrame((String)ar.result().body());
           	  }
           	  else {
-          		System.out.println("Failed generate content");
+          		logger.debug("Failed generate content");
         		    params.socket.writeFinalTextFrame("{\"error\": \"Failed generate content\"}");
           	  }
           });
@@ -54,11 +61,11 @@ enum MessageHandler {
 
             params.handler.getVertx().eventBus().send(Configuration.EB_ADDR_CONTENT_GENERATOR, Serializer.pack(probeReq), ar -> {
           	  if (ar.succeeded()) {
-          		    System.out.println("Sending generated content: " + ar.result().body());
+          		    logger.debug("Sending generated content: " + ar.result().body());
           		    params.socket.writeFinalTextFrame((String)ar.result().body());
           	  }
           	  else {
-          		System.out.println("Failed generate content");
+          		logger.debug("Failed generate content");
         		    params.socket.writeFinalTextFrame("{\"error\": \"Failed generate content\"}");
           	  }
           });
@@ -98,4 +105,6 @@ enum MessageHandler {
     */
 
     public abstract void invoke(Parameters params);
+    
+    private final static Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 }

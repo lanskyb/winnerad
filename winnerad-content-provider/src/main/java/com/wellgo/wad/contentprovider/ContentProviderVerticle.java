@@ -59,20 +59,20 @@ public class ContentProviderVerticle extends AbstractVerticle {
       server.websocketHandler(new Handler<ServerWebSocket>() {
           @Override
           public void handle(ServerWebSocket webs) {
-              System.out.println("Client connected");
+              logger.debug("Client connected");
               webs.writeBinaryMessage(Buffer.buffer("Hello user"));
-              System.out.println("Client's message: ");
-              webs.handler(data -> {System.out.println("Received data " + data.toString("ISO-8859-1"));});
+              logger.debug("Client's message: ");
+              webs.handler(data -> {logger.debug("Received data " + data.toString("ISO-8859-1"));});
 
           }
       });
 
       server.listen(8080, "localhost", res -> {
           if (res.succeeded()) {
-              System.out.println("Server is now listening!");
+              logger.debug("Server is now listening!");
               fut.complete();
           } else {
-              System.out.println("Failed to bind!");
+              logger.debug("Failed to bind!");
               fut.fail(res.cause());
           }
       });
@@ -97,8 +97,8 @@ public class ContentProviderVerticle extends AbstractVerticle {
       		websocketHandler(event -> {
       									event.handler(data -> {
 					                        					Packet packet = (Packet) (Serializer.unpack(data.toString(), Packet.class));
-					                        					System.out.println("Received data: " + data.toString());
-					                        					System.out.println("packet action " + packet.getAction());
+					                        					logger.debug("Received data: " + data.toString());
+					                        					logger.debug("packet action " + packet.getAction());
 					                        					messageHandler.get(packet.getAction()).invoke(new Parameters(data.toString(), event, this));
       														  }); // data
       									
